@@ -35,7 +35,7 @@
         },
         "Subnet Name 2": {
             "type": "string",
-            "defaultValue": "Subnet-1",
+            "defaultValue": "Subnet-2",
             "metadata": {
                 "description": "サブネットの名前"
             }
@@ -84,7 +84,8 @@
                         "addressPrefix": "[parameters('Subnet Prefix 2')]"
                     },
                     "dependsOn": [
-                        "[parameters('Virtual Network Name')]"
+                        "[parameters('Virtual Network Name')]",
+                        "[parameters('Subnet Name 1')]"
                     ]
                 }
             ]

@@ -1,5 +1,7 @@
 # Azure-Resources
 
+<br />
+
 ### 参考情報
 - <a href="https://docs.microsoft.com/ja-jp/azure/cloud-adoption-framework/ready/azure-best-practices/resource-naming">名前付け規則を定義する</a>
 
@@ -8,8 +10,6 @@
 <br />
 
 ## 仮想ネットワークの作成
-
-<br />
 
 ### パラメーター
 - **Virtual Network Name**: 仮想ネットワーク名
@@ -26,5 +26,8 @@
 
 - **Subnet Prefix 2**: サブネット アドレス範囲
 
+<br />
+
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fhiroyay-ms%2FAzure-Resources%2Fmain%2Ftemplates%2Fdeploy-vnet.json)
 
+<br />
