@@ -1,0 +1,94 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "Virtual Network Name": {
+            "type": "string",
+            "metadata": {
+                "description": "仮想ネットワーク名"
+            }
+        },
+        "Location": {
+            "type": "string",
+            "metadata": {
+                "description": "リージョン"
+            }
+        },
+        "Address Prefix": {
+            "type": "string",
+            "metadata": {
+                "description": "IPv4 アドレス空間"
+            }
+        },
+        "Subnet Name 1": {
+            "type": "string",
+            "defaultValue": "Subnet-1",
+            "metadata": {
+                "description": "サブネットの名前"
+            }
+        },
+        "Subnet Prefix 1": {
+            "type": "string",
+            "metadata": {
+                "description": "サブネット アドレス範囲"
+            }
+        },
+        "Subnet Name 2": {
+            "type": "string",
+            "defaultValue": "Subnet-1",
+            "metadata": {
+                "description": "サブネットの名前"
+            }
+        },
+        "Subnet Prefix 2": {
+            "type": "string",
+            "metadata": {
+                "description": "サブネット アドレス範囲"
+            }
+        }
+    },
+    "functions": [],
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2018-10-01",
+            "name": "[parameters('Virtual Network Name')]",
+            "location": "[parameters('Location')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('Address Prefix')]"
+                    ]
+                }
+            },
+            "resources": [
+                {
+                    "type": "subnets",
+                    "apiVersion": "2018-10-01",
+                    "name": "[parameters('Subnet Name 1')]",
+                    "location": "[parameters('Location')]",
+                    "properties": {
+                        "addressPrefix": "[parameters('Subnet Prefix 1')]"
+                    },
+                    "dependsOn": [
+                        "[parameters('Virtual Network Name')]"
+                    ]
+                },
+                {
+                    "type": "subnets",
+                    "apiVersion": "2018-10-01",
+                    "name": "[parameters('Subnet Name 2')]",
+                    "location": "[parameters('Location')]",
+                    "properties": {
+                        "addressPrefix": "[parameters('Subnet Prefix 2')]"
+                    },
+                    "dependsOn": [
+                        "[parameters('Virtual Network Name')]"
+                    ]
+                }
+            ]
+        }
+    ],
+    "outputs": {}
+}
