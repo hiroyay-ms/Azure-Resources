@@ -9,6 +9,7 @@
 
 <br />
 
+### リソースの展開
 - [仮想ネットワーク](#仮想ネットワーク)
 - [Windows Server 仮想マシン](#windows-server-仮想マシン)
 - [SQL Server 仮想マシン](#sql-server-仮想マシン)
