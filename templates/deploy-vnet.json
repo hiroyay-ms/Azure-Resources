@@ -2,45 +2,45 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "Virtual Network Name": {
+        "virtualNetworkName": {
             "type": "string",
             "metadata": {
                 "description": "仮想ネットワーク名"
             }
         },
-        "Location": {
+        "location": {
             "type": "string",
             "metadata": {
                 "description": "リージョン"
             }
         },
-        "Address Prefix": {
+        "addressPrefix": {
             "type": "string",
             "metadata": {
                 "description": "IPv4 アドレス空間"
             }
         },
-        "Subnet Name 1": {
+        "subnetName1": {
             "type": "string",
             "defaultValue": "Subnet-1",
             "metadata": {
                 "description": "サブネットの名前"
             }
         },
-        "Subnet Prefix 1": {
+        "subnetPrefix1": {
             "type": "string",
             "metadata": {
                 "description": "サブネット アドレス範囲"
             }
         },
-        "Subnet Name 2": {
+        "subnetName2": {
             "type": "string",
             "defaultValue": "Subnet-2",
             "metadata": {
                 "description": "サブネットの名前"
             }
         },
-        "Subnet Prefix 2": {
+        "subnetPrefix2": {
             "type": "string",
             "metadata": {
                 "description": "サブネット アドレス範囲"
@@ -53,12 +53,12 @@
         {
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2018-10-01",
-            "name": "[parameters('Virtual Network Name')]",
-            "location": "[parameters('Location')]",
+            "name": "[parameters('virtualNetworkName')]",
+            "location": "[parameters('location')]",
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
-                        "[parameters('Address Prefix')]"
+                        "[parameters('addressPrefix')]"
                     ]
                 }
             },
@@ -66,26 +66,26 @@
                 {
                     "type": "subnets",
                     "apiVersion": "2018-10-01",
-                    "name": "[parameters('Subnet Name 1')]",
-                    "location": "[parameters('Location')]",
+                    "name": "[parameters('subnetName1')]",
+                    "location": "[parameters('location')]",
                     "properties": {
-                        "addressPrefix": "[parameters('Subnet Prefix 1')]"
+                        "addressPrefix": "[parameters('subnetPrefix1')]"
                     },
                     "dependsOn": [
-                        "[parameters('Virtual Network Name')]"
+                        "[parameters('virtualNetworkName')]"
                     ]
                 },
                 {
                     "type": "subnets",
                     "apiVersion": "2018-10-01",
-                    "name": "[parameters('Subnet Name 2')]",
-                    "location": "[parameters('Location')]",
+                    "name": "[parameters('subnetName2')]",
+                    "location": "[parameters('location')]",
                     "properties": {
-                        "addressPrefix": "[parameters('Subnet Prefix 2')]"
+                        "addressPrefix": "[parameters('subnetPrefix2')]"
                     },
                     "dependsOn": [
-                        "[parameters('Virtual Network Name')]",
-                        "[parameters('Subnet Name 1')]"
+                        "[parameters('virtualNetworkName')]",
+                        "[parameters('subnetName1')]"
                     ]
                 }
             ]
