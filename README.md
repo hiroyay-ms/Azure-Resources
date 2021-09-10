@@ -57,7 +57,7 @@
 
 - **osVersion**: OS イメージ（Windows Server 2012 R2, Windows Server 2016, Windows Server 2019 から選択）
 
-- **machineSize**: マシン サイズ（Standard_B2s, Standard_B2ms, Standard_B4ms, Standard_D2S_v3, Standard_D4s_v3, Standard_F2s_v2, Standard_F4s_v2 から選択）
+- **machineSize**: マシン サイズ（B, Dv3, Fv2 から選択）
 
 - **storageType**: ストレージの種類（Standard_LRS, StandardSSD_LRS, Premium_SSD から選択）
 
@@ -67,7 +67,7 @@
 
 - **publicIPAddress**: Public IP Address の作成
 
-### 提供イメージsの取得
+### 提供イメージの取得
 ```PowerShell
 Get-AzVMImageSku -Location WestUS2 -PublisherName "MicrosoftWindowsServer" -Offer "WindowsServer"
 ```
@@ -92,11 +92,11 @@ Get-AzVMImageSku -Location WestUS2 -PublisherName "MicrosoftWindowsServer" -Offe
 
 - **virtualMachineName**: 仮想マシン名
 
-- **osVersion**: OS イメージ（sql2019-ws2019, sql2016sp2-ws2019, sql2017-ws2019, SQL2017-WS2016, SQL2016SP1-WS2016, SQL2016SP2-WS2012R2, SQL2014SP2-WS2012R2, SQL2012SP4-WS2012R2 から選択）
+- **osVersion**: OS イメージ（OS と SQL Server のバージョンを選択）
 
 - **edition**: SQL Server エディション（Enterprise, Standard, Web, Express から選択）
 
-- **machineSize**: マシン サイズ（Standard_B2s, Standard_B2ms, Standard_B4ms, Standard_D2S_v3, Standard_D4s_v3, Standard_F2s_v2, Standard_F4s_v2 から選択）
+- **machineSize**: マシン サイズ（B, Dv3, Fv2 から選択）
 
 - **storageType**: ストレージの種類（Standard_LRS, StandardSSD_LRS, Premium_SSD から選択）
 
@@ -141,7 +141,7 @@ Get-AzVMImageSku -Location $location -PublisherName "MicrosoftSQLServer" -Offer 
 
 - **sqlAdministratorPassword**: パスワード
 
-- **skuName**: コンピューティング レベル（GP_S_Gen5_1, GP_S_Gen5_2, GP_S_Gen5_4, GP_Gen5_2, GP_Gen5_4）
+- **skuName**: コンピューティング レベル（プロビジョニング済み、サーバーレスを選択）
 
 - **databaseName**: データベース名
 
@@ -151,7 +151,7 @@ Get-AzVMImageSku -Location $location -PublisherName "MicrosoftSQLServer" -Offer 
 
 <br />
 
-### Sku の取得
+### SKU の取得
 ```PowerShell
 Get-AzSqlServerServiceObjective -Location $location | Where-Object {$_.Edition -eq "GeneralPurpose"}
 ```
