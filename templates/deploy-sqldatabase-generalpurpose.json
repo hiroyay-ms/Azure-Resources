@@ -1,0 +1,134 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "sqlServerName": {
+            "type": "string",
+            "metadata": {
+                "description": "SQL Server 名"
+            }
+        },
+        "sqlAdministratorLogin": {
+            "type": "string",
+            "metadata": {
+                "description": "サーバー管理者"
+            }
+        },
+        "sqlAdministratorPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "パスワード"
+            }
+        },
+        "skuName": {
+            "type": "string",
+            "defaultValue": "GP_S_Gen5_1",
+            "allowedValues": [
+                "GP_S_Gen5_1",
+                "GP_S_Gen5_2",
+                "GP_S_Gen5_4",
+                "GP_Gen5_2",
+                "GP_Gen5_4"
+            ],
+            "metadata": {
+                "description":"GP_S は Serverless"
+            }
+        },
+        "databaseName": {
+            "type": "string",
+            "metadata": {
+                "description": "データベース名"
+            }
+        },
+        "collation": {
+            "type": "string",
+            "defaultValue": "SQL_Latin1_General_CP1_CI_AS",
+            "metadata": {
+                "description": "照合順序"
+            }
+        },
+        "backupStorage": {
+            "type": "string",
+            "defaultValue": "Geo",
+            "allowedValues": [
+                "Local",
+                "Zone",
+                "Geo"
+            ],
+            "metadata": {
+                "description": "バックアップ ストレージの冗長性"
+            }
+        }
+    },
+    "functions": [],
+    "variables": {
+        "location": "[resourceGroup().location]",
+        "minimalTlsVersion": 1.2,
+        "tier": "GeneralPurpose",
+        "maxSizeBytes": 5368709120,
+        "maintenanceConfiguration": "[concat('SQL_', variables('location'), '_DB_2')]",
+        "maintenanceConfigurationId": "[subscriptionResourceId('Microsoft.Maintenance/publicMaintenanceConfigurations', variables('maintenanceConfiguration'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Sql/servers",
+            "apiVersion": "2019-06-01-preview",
+            "name": "[parameters('sqlServerName')]",
+            "location": "[variables('location')]",
+            "properties": {
+                "administratorLogin": "[parameters('sqlAdministratorLogin')]",
+                "administratorLoginPassword": "[parameters('sqlAdministratorPassword')]",
+                "minimalTlsVersion": "[variables('minimalTlsVersion')]"
+            },
+            "resources": [
+                {
+                    "type": "databases",
+                    "apiVersion": "2021-02-01-preview",
+                    "dependsOn": [
+                        "[concat('Microsoft.Sql/servers/', parameters('sqlServerName'))]"
+                    ],
+                    "name": "[parameters('databaseName')]",
+                    "location": "[variables('location')]",
+                    "sku": {
+                        "name": "[parameters('skuName')]",
+                        "tier": "[variables('tier')]"
+                    },
+                    "properties": {
+                        "collation": "[parameters('collation')]",
+                        "maxSizeBytes": "[variables('maxSizeBytes')]",
+                        "isLedgerOn": false,
+                        "zoneRedundant": false,
+                        "maintenanceConfigurationId": "[variables('maintenanceConfigurationId')]",
+                        "requestedBackupStorageRedundancy": "[parameters('backupStorage')]"
+                    }
+                },
+                {
+                    "type": "firewallRules",
+                    "apiVersion": "2014-04-01",
+                    "dependsOn": [
+                        "[concat('Microsoft.Sql/servers/', parameters('sqlServerName'))]"
+                    ],
+                    "name": "AllowAllWindowsAzureIps",
+                    "location": "[variables('location')]",
+                    "properties": {
+                        "endIpAddress": "0.0.0.0",
+                        "startIpAddress": "0.0.0.0"
+                    }
+                },
+                {
+                    "type": "connectionPolicies",
+                    "apiVersion": "2014-04-01",
+                    "dependsOn": [
+                        "[concat('Microsoft.Sql/servers/', parameters('sqlServerName'))]"
+                    ],
+                    "name": "Default",
+                    "location": "[variables('location')]",
+                    "properties": {
+                        "connectionType": "Default"
+                    }
+                }
+            ]
+        }
+    ],
+    "outputs": {}
+}
