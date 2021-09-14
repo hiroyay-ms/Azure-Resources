@@ -1,0 +1,114 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "storageAccountName": {
+            "type": "string",
+            "metadata": {
+                "description": "ストレージ アカウント名（英数小文字のみ）"
+            }
+        },
+        "sku": {
+            "type": "string",
+            "defaultValue": "Standard_LRS",
+            "allowedValues": [
+                "Standard_LRS",
+                "Standard_ZRS",
+                "Standard_GRS",
+                "Standard_GZRS",
+                "Standard_RAGRS",
+                "Standard_RAGZRS"
+            ],
+            "metadata": {
+                "description": "ストレージの冗長性"
+            }
+        },
+        "accessTier": {
+            "type": "string",
+            "defaultValue": "Hot",
+            "allowedValues": [
+                "Hot",
+                "Cool"
+            ],
+            "metadata": {
+                "description": "アクセス層"
+            }
+        },
+        "isContainerRestoreEnabled": {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata": {
+                "description": "コンテナーのポイントタイムリストアの有効化"
+            }
+        },
+        "isBlobSoftDeleteEnabled": {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata": {
+                "description": "BLOB の論理的な削除の有効化"
+            }
+        },
+        "isContainerSoftDeleteEnabled": {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata": {
+                "description": "コンテナーの論理的な削除の有効化"
+            }
+        },
+        "isVersioningEnabled": {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata": {
+                "description": "BLOB のバージョン管理の有効化"
+            }
+        },
+        "changeFeed": {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata": {
+                "description": "BLOB の変更フィードの有効化"
+            }
+        }
+    },
+    "functions": [],
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "name": "[parameters('storageAccountName')]",
+            "location": "[resourceGroup().location]",
+            "kind": "StorageV2",
+            "sku": {
+                "name": "[parameters('sku')]"
+            },
+            "properties": {
+                "accessTier": "[parameters('accessTier')]"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices",
+            "apiVersion": "2021-04-01",
+            "name": "[concat(parameters('storageAccountName'), '/default')]",
+            "properties": {
+                "restorePolicy": {
+                    "enabled": "[parameters('isContainerRestoreEnabled')]"
+                },
+                "deleteRetentionPolicy": {
+                    "enabled": "[parameters('isBlobSoftDeleteEnabled')]"
+                },
+                "containerDeleteRetentionPolicy": {
+                    "enabled": "[parameters('isContainerSoftDeleteEnabled')]"
+                },
+                "changeFeed": {
+                    "enabled": "[parameters('changeFeed')]"
+                },
+                "isVersioningEnabled": "[parameters('isVersioningEnabled')]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]"
+            ]
+        }
+    ],
+    "outputs": {}
+}

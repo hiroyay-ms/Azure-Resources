@@ -14,6 +14,7 @@
 - [Windows Server 仮想マシン](#windows-server-仮想マシン)
 - [SQL Server 仮想マシン](#sql-server-仮想マシン)
 - [SQL Database](#sql-database)
+- [ストレージ アカウント](#ストレージ-アカウント)
 
 <br />
 
@@ -155,3 +156,60 @@ Get-AzVMImageSku -Location $location -PublisherName "MicrosoftSQLServer" -Offer 
 ```PowerShell
 Get-AzSqlServerServiceObjective -Location $location | Where-Object {$_.Edition -eq "GeneralPurpose"}
 ```
+
+<br />
+
+## ストレージ アカウント
+
+- パフォーマンス： Standard
+- 接続方法： パブリック エンドポイント（すべてのネットワーク）
+- ルーティングの優先順位： Microsoft ネットワーク ルーティング
+
+<br />
+
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fhiroyay-ms%2FAzure-Resources%2Fmain%2Ftemplates%2Fdeploy-storage-account.json)
+
+### パラメーター
+- **storageAccountName**: ストレージ アカウント名（英数小文字のみ）
+
+- **sku**: ストレージの冗長性
+
+- **accessTier**: アクセス層
+
+- **isContainerRestoreEnabled**: コンテナーのポイントタイムリストアの有効化
+
+- **isBlobSoftDeleteEnabled**: BLOB の論理的な削除の有効化
+
+- **isContainerSoftDeleteEnabled**: コンテナーの論理的な削除の有効化
+
+- **isVersioningEnabled**: BLOB のバージョン管理の有効化
+
+- **changeFeed**: BLOB の変更フィードの有効化
+
+<br />
+
+## Data Factory
+
+- バージョン： V2
+- リポジトリの種類： GitHub（後から構成も可）
+
+<br />
+
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fhiroyay-ms%2FAzure-Resources%2Fmain%2Ftemplates%2Fdeploy-data-factory.json)
+
+### パラメーター
+- **name**: 名前
+
+- **vnetEnables**: マネージド仮想ネットワークの有効化
+
+- **publicNetworkAccess**: 接続方法（パブリック エンドポイント or プライベート エンドポイント
+
+- **gitConfigureLater**: 後で Git を構成する
+
+- **gitAccountName**: GitHub アカウント
+
+- **gitRepositoryName**: リポジトリ名
+
+- **gitCollaborationBranch**: ブランチ名
+
+- **gitRootFolder**: ルート フォルダー
