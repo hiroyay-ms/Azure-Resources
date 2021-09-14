@@ -1,0 +1,112 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "name": {
+            "type": "string",
+            "metadata": {
+                "description": "名前"
+            }
+        },
+        "vnetEnables": {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata": {
+                "description": "マネージド仮想ネットワークの有効化"
+            }
+        },
+        "publicNetworkAccess": {
+            "type": "bool",
+            "defaultValue": true,
+            "metadata": {
+                "description": "接続方法（パブリック エンドポイント or プライベート エンドポイント"
+            }
+        },
+        "gitConfigureLater": {
+            "type": "bool",
+            "defaultValue": true,
+            "metadata": {
+                "description": "後で Git を構成する"
+            }
+        },
+        "gitAccountName": {
+            "type": "string",
+            "defaultValue": "-",
+            "metadata": {
+                "description": "GitHub account"
+            }
+        },
+        "gitRepositoryName": {
+            "type": "string",
+            "defaultValue": "-",
+            "metadata": {
+                "description": "リポジトリ名"
+            }
+        },
+        "gitCollaborationBranch": {
+            "type": "string",
+            "defaultValue": "main",
+            "metadata": {
+                "description": "ブランチ名"
+            }
+        },
+        "gitRootFolder": {
+            "type": "string",
+            "defaultValue": "/",
+            "metadata": {
+                "description": "ルート フォルダー"
+            }
+        }
+    },
+    "functions": [],
+    "variables": {
+        "gitRepoType": "FactoryGitHubConfiguration"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.DataFactory/factories",
+            "apiVersion": "2018-06-01",
+            "name": "[parameters('name')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "publicNetworkAccess": "[if(bool(parameters('publicNetworkAccess')), 'Enabled', 'Disabled')]",
+                "repoConfiguration": "[if(bool(parameters('gitConfigureLater')), json('null'), json(concat('{\"type\": \"', variables('gitRepoType'), '\",','\"accountName\": \"', parameters('gitAccountName'), '\",','\"repositoryName\": \"', parameters('gitRepositoryName'), '\",','\"collaborationBranch\": \"', parameters('gitCollaborationBranch'), '\",','\"rootFolder\": \"', parameters('gitRootFolder'), '\"}')))]"
+            },
+            "resources": [
+                {
+                    "condition": "[parameters('vnetEnables')]",
+                    "type": "Microsoft.DataFactory/factories/managedVirtualNetworks",
+                    "apiVersion": "2018-06-01",
+                    "name": "[concat(parameters('name'), '/default')]",
+                    "properties": {},
+                    "dependsOn": [
+                        "[concat('Microsoft.DataFactory/factories/', parameters('name'))]"
+                    ]
+                },
+                {
+                    "condition": "[parameters('vnetEnables')]",
+                    "type": "Microsoft.DataFactory/factories/integrationRuntimes",
+                    "apiVersion": "2018-06-01",
+                    "name": "[concat(parameters('name'), '/AutoResolveIntegrationRuntime')]",
+                    "properties": {
+                        "type": "Managed",
+                        "managedVirtualNetwork": {
+                            "referenceName": "default",
+                            "type": "ManagedVirtualNetworkReference"
+                        },
+                        "typeProperties": {
+                            "computeProperties": {
+                                "location": "AutoResolve"
+                            }
+                        }
+                    },
+                    "dependsOn": [
+                        "[concat('Microsoft.DataFactory/factories/', parameters('name'))]",
+                        "[concat('Microsoft.DataFactory/factories/', parameters('name'), '/managedVirtualNetworks/default')]"
+                    ]
+                }
+            ]
+        }
+    ],
+    "outputs": {}
+}
