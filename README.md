@@ -11,10 +11,13 @@
 
 ### リソースの展開
 - [仮想ネットワーク](#仮想ネットワーク)
+- [仮想ネットワーク with Azure Bastion](#仮想ネットワーク-with-azure-bastion)
 - [Windows Server 仮想マシン](#windows-server-仮想マシン)
+- [Windows Server 仮想マシン (IE セキュリティ強化の構成無効化)](#windows-server-仮想マシン-ie-セキュリティ強化の構成無効化)
 - [SQL Server 仮想マシン](#sql-server-仮想マシン)
 - [SQL Database](#sql-database)
 - [ストレージ アカウント](#ストレージ-アカウント)
+- [Azure Key Vault](#azure-key-vault)
 
 <br />
 
@@ -269,3 +272,37 @@ Get-AzSqlServerServiceObjective -Location $location | Where-Object {$_.Edition -
 - **gitCollaborationBranch**: ブランチ名
 
 - **gitRootFolder**: ルート フォルダー
+
+<br />
+
+## Azure Key Vault
+
+- アクセスの有効化
+  - Azure Virtual Machines (展開用)： false
+  - Azure Resource Manager (テンプレートの展開用)： false
+  - Azure Disk Encryption (ボリューム暗号化用)： false
+- アクセス許可モデル： コンテナーのアクセス ポリシー
+- 接続方法
+  - パブリック エンドポイント（すべてのネットワーク）
+
+<br />
+
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fhiroyay-ms%2FAzure-Resources%2Fmain%2Ftemplates%2Fdeploy-key-vault.json)
+
+### パラメーター
+- **keyVaultName**: Key Vault 名
+
+- **skuName**: 価格レベル（Standard or Premium）
+
+- **enableSoftDelete**: 論理的な削除
+
+- **softDeleteRetentionInDays**: 削除されたコンテナーを保持する日数
+
+- **objectId**: 
+
+<br />
+
+### オブジェクト ID の取得
+```
+az ad user show --id "Email Address that is used to sign in to Azure" --query "objectId"
+```
