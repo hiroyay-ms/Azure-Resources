@@ -1,0 +1,158 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "virtualNetworkName": {
+            "type": "string",
+            "metadata": {
+                "description": "仮想ネットワーク名"
+            }
+        },
+        "location": {
+            "type": "string",
+            "metadata": {
+                "description": "リージョン"
+            }
+        },
+        "addressPrefix": {
+            "type": "string",
+            "metadata": {
+                "description": "IPv4 アドレス空間"
+            }
+        },
+        "subnetName1": {
+            "type": "string",
+            "defaultValue": "Subnet-1",
+            "metadata": {
+                "description": "サブネットの名前"
+            }
+        },
+        "subnetPrefix1": {
+            "type": "string",
+            "metadata": {
+                "description": "サブネット アドレス範囲"
+            }
+        },
+        "subnetName2": {
+            "type": "string",
+            "defaultValue": "Subnet-2",
+            "metadata": {
+                "description": "サブネットの名前"
+            }
+        },
+        "subnetPrefix2": {
+            "type": "string",
+            "metadata": {
+                "description": "サブネット アドレス範囲"
+            }
+        },
+        "bastionSubnetPrefix": {
+            "type": "string",
+            "metadata": {
+                "description": "Azure Bastion サブネット アドレス範囲"
+            }
+        },
+        "bastionHostName": {
+            "type": "string",
+            "metadata": {
+                "description": "Azure Bastion の名前"
+            }
+        }
+    },
+    "functions": [],
+    "variables": {
+        "bastionPip": "[concat('pip-', replace(parameters('bastionHostName'), 'bas-', ''))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2018-10-01",
+            "name": "[parameters('virtualNetworkName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('addressPrefix')]"
+                    ]
+                }
+            },
+            "resources": [
+                {
+                    "type": "subnets",
+                    "apiVersion": "2018-10-01",
+                    "name": "[parameters('subnetName1')]",
+                    "location": "[parameters('location')]",
+                    "properties": {
+                        "addressPrefix": "[parameters('subnetPrefix1')]"
+                    },
+                    "dependsOn": [
+                        "[parameters('virtualNetworkName')]"
+                    ]
+                },
+                {
+                    "type": "subnets",
+                    "apiVersion": "2018-10-01",
+                    "name": "[parameters('subnetName2')]",
+                    "location": "[parameters('location')]",
+                    "properties": {
+                        "addressPrefix": "[parameters('subnetPrefix2')]"
+                    },
+                    "dependsOn": [
+                        "[parameters('virtualNetworkName')]",
+                        "[parameters('subnetName1')]"
+                    ]
+                },
+                {
+                    "type": "subnets",
+                    "apiVersion": "2018-10-01",
+                    "name": "AzureBastionSubnet",
+                    "properties": {
+                        "addressPrefix": "[parameters('bastionSubnetPrefix')]"
+                    },
+                    "dependsOn": [
+                        "[parameters('virtualNetworkName')]"
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2019-02-01",
+            "name": "[variables('bastionPip')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Standard"
+            },
+            "properties": {
+                "publicIPAllocationMethod": "Static"
+            }
+        },
+        {
+            "type": "Microsoft.Network/bastionHosts",
+            "apiVersion": "2019-06-01",
+            "name": "[parameters('bastionHostName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig",
+                        "properties": {
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets',parameters('virtualNetworkName'), 'AzureBastionSubnet')]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('bastionPip'))]"
+                            }
+                        }
+                    }
+                ]
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', variables('bastionPip'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), 'AzureBastionSubnet')]"
+            ]
+        }
+    ],
+    "outputs": {}
+}

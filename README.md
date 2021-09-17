@@ -41,6 +41,33 @@
 
 <br />
 
+## 仮想ネットワーク with Azure Bastion
+
+<br />
+
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fhiroyay-ms%2FAzure-Resources%2Fmain%2Ftemplates%2Fdeploy-vnet-two-subnet-with-bastion.json)
+
+### パラメーター
+- **virtualNetworkName**: 仮想ネットワーク名
+
+- **location**: リージョン
+
+- **addressPrefix**: IPv4 名前空間
+
+- **subnetName1**: サブネット名
+
+- **subnetPrefix1**: サブネット アドレス範囲
+
+- **subnetName2**: サブネット名
+
+- **subnetPrefix2**: サブネット アドレス範囲
+
+- **bastionSubnetPrefix**: Azure Bastion を展開するサブネット アドレス範囲
+
+- **bastionHostName**: Azure Bastion の名前
+
+<br />
+
 ## Windows Server 仮想マシン
 
 <br />
@@ -72,6 +99,35 @@
 ```PowerShell
 Get-AzVMImageSku -Location WestUS2 -PublisherName "MicrosoftWindowsServer" -Offer "WindowsServer"
 ```
+
+<br />
+
+## Windows Server 仮想マシン (IE セキュリティ強化の構成無効化)
+
+<br />
+
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fhiroyay-ms%2FAzure-Resources%2Fmain%2Ftemplates%2Fdeploy-windows-vm-with-extension.json)
+
+### パラメーター
+- **virtualNetworkName**: 仮想マシンを展開する仮想ネットワーク
+
+- **subnetName**: 仮想マシンを展開するサブネット
+
+- **vnetResourceGroup**: 仮想ネットワークが所属するリソース グループ
+
+- **virtualMachineName**: 仮想マシン名
+
+- **osVersion**: OS イメージ（Windows Server 2012 R2, Windows Server 2016, Windows Server 2019 から選択）
+
+- **machineSize**: マシン サイズ（B, Dv3, Fv2 から選択）
+
+- **storageType**: ストレージの種類（Standard_LRS, StandardSSD_LRS, Premium_SSD から選択）
+
+- **adminUserName**: 管理者アカウント
+
+- **adminPassword**: 管理者パスワード
+
+- **publicIPAddress**: Public IP Address の作成
 
 <br />
 
