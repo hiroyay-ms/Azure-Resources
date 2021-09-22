@@ -20,6 +20,13 @@
                 "description": "仮想ネットワークのリソース グループ名"
             }
         },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "仮想マシンを配置する地域（仮想ネットワークと同じ）"
+            }
+        },
         "virtualMachineName": {
             "type": "string",
             "metadata": {
@@ -106,7 +113,7 @@
     },
     "functions": [],
     "variables": {
-        "location": "[resourceGroup().location]",
+        "location": "[parameters('location')]",
         "subnetRef": "[resourceId(parameters('vnetResourceGroup'), 'Microsoft.Network/virtualNetWorks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
         "publicIpAddressId": {
             "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIPAddresses', concat(parameters('virtualMachineName'), '-PIP'))]"
