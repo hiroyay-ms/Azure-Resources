@@ -150,6 +150,8 @@ Get-AzVMImageSku -Location WestUS2 -PublisherName "MicrosoftWindowsServer" -Offe
 
 - **vnetResourceGroup**: 仮想ネットワークが所属するリソース グループ
 
+- **location**: 仮想ネットワークを展開した地域
+
 - **virtualMachineName**: 仮想マシン名
 
 - **osVersion**: OS イメージ（OS と SQL Server のバージョンを選択）
