@@ -20,6 +20,12 @@
                 "description": "仮想ネットワークのリソース グループ名"
             }
         },
+        "location": {
+            "type": "string",
+            "metadata": {
+                "description": "仮想ネットワークを展開した地域"
+            }
+        },
         "virtualMachineName": {
             "type": "string",
             "metadata": {
@@ -30,11 +36,13 @@
             "type": "string",
             "defaultValue": "2019-Datacenter-smalldisk",
             "allowedValues": [
+                "2022-datacenter",
                 "2019-Datacenter",
                 "2016-Datacenter",
                 "2012-R2-Datacenter",
                 "2012-Datacenter",
                 "2008-R2-SP1",
+                "2022-datacenter-core-smalldisk",
                 "2019-Datacenter-smalldisk",
                 "2016-Datacenter-smalldisk",
                 "2012-R2-Datacenter-smalldisk",
@@ -94,7 +102,7 @@
     },
     "functions": [],
     "variables": {
-        "location": "[resourceGroup().location]",
+        "location": "[parameters('location')]",
         "subnetRef": "[resourceId(parameters('vnetResourceGroup'), 'Microsoft.Network/virtualNetWorks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
         "publicIpAddressId": {
             "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIPAddresses', concat(parameters('virtualMachineName'), '-PIP'))]"

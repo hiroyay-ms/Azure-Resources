@@ -1,9 +1,192 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {},
+    "parameters": {
+        "virtualNetworkName": {
+            "type": "string",
+            "metadata": {
+                "description": "仮想マシンを展開する仮想ネットワーク"
+            }
+        },
+        "subnetName": {
+            "type": "string",
+            "metadata": {
+                "description": "仮想マシンを展開するサブネット名"
+            }
+        },
+        "vnetResourceGroup": {
+            "type": "string",
+            "metadata": {
+                "description": "仮想ネットワークのリソース グループ名"
+            }
+        },
+        "location": {
+            "type": "string",
+            "metadata": {
+                "description": "仮想ネットワークを展開した地域"
+            }
+        },
+        "virtualMachineName": {
+            "type": "string",
+            "metadata": {
+                "description": "仮想マシン名"
+            }
+        },
+        "imageReference": {
+            "type": "string",
+            "defaultValue": "18.04-LTS",
+            "allowedValues": [
+                "18.04-LTS",
+                "20_04-lts"
+            ],
+            "metadata": {
+                "description": "Ubuntu OS バージョン"
+            }
+        },
+        "machineSize": {
+            "type": "string",
+            "allowedValues": [
+                "Standard_B2s",
+                "Standard_B2ms",
+                "Standard_B4ms",
+                "Standard_D2S_v3",
+                "Standard_D4s_v3",
+                "Standard_F2s_v2",
+                "Standard_F4s_v2"
+            ],
+            "defaultValue": "Standard_B2s",
+            "metadata": {
+                "description": "仮想マシンのインスタンス サイズ"
+            }
+        },
+        "storageType": {
+            "type": "string",
+            "defaultValue": "StandardSSD_LRS",
+            "allowedValues": [
+                "Standard_LRS",
+                "StandardSSD_LRS",
+                "Premium_SSD"
+            ],
+            "metadata": {
+                "description": "ストレージの種類"
+            }
+        },
+        "adminUserName": {
+            "type": "string",
+            "defaultValue": "AzureUser",
+            "metadata": {
+                "description": "ローカル管理者"
+            }
+        },
+        "adminPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "パスワード"
+            }
+        },
+        "publicIPAddress": {
+            "type": "bool",
+            "metadata": {
+                "description": "パブリック IP アドレスの作成"
+            }
+        }
+    },
     "functions": [],
-    "variables": {},
-    "resources": [],
+    "variables": {
+        "networkInterface": "[concat(parameters('virtualMachineName'), '-NIC')]",
+        "subnetRef": "[resourceId(parameters('vnetResourceGroup'), 'Microsoft.Network/virtualNetWorks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
+        "publicIpAddressId": {
+            "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIPAddresses', concat(parameters('virtualMachineName'), '-PIP'))]"
+        },
+        "publisher": "canonical",
+        "offer": "[if(contains(parameters('imageReference'),'18'), 'UbuntuServer', '0001-com-ubuntu-server-focal')]"
+    },
+    "resources": [
+        {
+            "condition": "[parameters('publicIPAddress')]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2020-11-01",
+            "name": "[concat(parameters('virtualMachineName'), '-PIP')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Basic",
+                "tier": "Regional"
+            },
+            "properties": {
+                "publicIPAddressVersion": "IPv4",
+                "publicIPAllocationMethod": "Dynamic",
+                "idleTimeoutInMinutes": 4,
+                "ipTags": []
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2020-11-01",
+            "name": "[variables('networkInterface')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": "[if(parameters('publicIPAddress'), variables('publicIpAddressId'), json('null'))]"
+                        }
+                    }
+                ]
+            },
+            "dependsOn": [
+                "[concat(parameters('virtualMachineName'), '-PIP')]"
+            ]
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2021-03-01",
+            "name": "[parameters('virtualMachineName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('machineSize')]"
+                },
+                "storageProfile": {
+                    "osDisk": {
+                        "createOption": "FromImage",
+                        "managedDisk": {
+                            "storageAccountType": "[parameters('storageType')]"
+                        }
+                    },
+                    "imageReference": {
+                        "publisher": "[variables('publisher')]",
+                        "offer": "[variables('offer')]",
+                        "sku": "[parameters('imageReference')]",
+                        "version": "latest"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('networkInterface'))]"
+                        }
+                    ]
+                },
+                "osProfile": {
+                    "computerName": "[parameters('virtualMachineName')]",
+                    "adminUsername": "[parameters('adminUserName')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "linuxConfiguration": {
+                        "patchSettings": {
+                            "patchMode": "ImageDefault"
+                        }
+                    }
+                }
+            },
+            "dependsOn": [
+                "[variables('networkInterface')]"
+            ]
+        }
+    ],
     "outputs": {}
 }
