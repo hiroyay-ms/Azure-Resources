@@ -120,7 +120,7 @@ Get-AzVMImageSku -Location WestUS2 -PublisherName "MicrosoftWindowsServer" -Offe
 
 - **virtualMachineName**: 仮想マシン名
 
-- **osVersion**: OS イメージ（Windows Server 2012 R2, Windows Server 2016, Windows Server 2019 から選択）
+- **osVersion**: OS イメージ（Windows Server 2012 R2, Windows Server 2016, Windows Server 2019, Windows Server 2022 から選択）
 
 - **machineSize**: マシン サイズ（B, Dv3, Fv2 から選択）
 
