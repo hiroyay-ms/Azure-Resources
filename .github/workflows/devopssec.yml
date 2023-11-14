@@ -28,7 +28,7 @@ jobs:
     - name: Upload alerts to Security tab
       uses: github/codeql-action/upload-sarif@v2
       with:
-        sarif_file: ${{ steps.msdo.outputs.sarifFile }}
+        sarif_file: "${{ github.workspace }}/.gdn/rc/trivy/001/trivy.sarif"
 
       # Upload alerts file as a workflow artifact
     - name: Upload alerts file as a workflow artifact
